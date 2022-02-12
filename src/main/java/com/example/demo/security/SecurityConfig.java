@@ -1,5 +1,7 @@
 package com.example.demo.security;
 
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import org.springframework.context.annotation.Bean;
@@ -11,8 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.demo.filter.CustomAuthenticationFilter;
+import com.example.demo.filter.CustomAuthorizationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,11 +35,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		
+		CustomAuthenticationFilter customAuthentication = new CustomAuthenticationFilter(authenticationManagerBean());
+		customAuthentication.setFilterProcessesUrl("/api/login");
+		
 		http.csrf().disable();
+		
+		//org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 		http.sessionManagement().sessionCreationPolicy(STATELESS);
-		http.authorizeRequests().anyRequest().permitAll();
-		http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+		
+		http.authorizeRequests().antMatchers("/login/**", "/api/token/refresh/**").permitAll();
+		
+		//org.springframework.http.HttpMethod.GET
+		http.authorizeRequests().antMatchers(GET,"/api/user/**").hasAnyAuthority("ROLE_USER");
+		
+		//org.springframework.http.HttpMethod.POST
+		http.authorizeRequests().antMatchers(POST,"/api/user/save/**").hasAnyAuthority("ROLE_USER");
+		//http.authorizeRequests().anyRequest().permitAll();
+		http.authorizeRequests().anyRequest().authenticated();
+		http.addFilter(customAuthentication);
+		http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
+	
+	
 	
 	@Bean
 	@Override
