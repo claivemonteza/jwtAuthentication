@@ -16,13 +16,13 @@ The API base URL is https://localhost:8080 and can be used to access the followi
 ### Login (POST)
 - endpoint -```/api/login```
 - 
-### save user (POST)
+### Save user (POST)
 - endpoint -```/api/users/save```
 
-### save role (POST)
+### Save role (POST)
 - endpoint -```/api/role/save```
 
-### save add role to user (POST)
+### Save add role to user (POST)
 - endpoint -```/api/role/addtouser```
 
 ### Fetch user (GET)
