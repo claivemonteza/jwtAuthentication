@@ -13,8 +13,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.domain.Permission;
 import com.example.demo.domain.Role;
 import com.example.demo.domain.User;
+import com.example.demo.repository.PermissionRepo;
 import com.example.demo.repository.RoleRepo;
 import com.example.demo.repository.UserRepo;
 
@@ -30,6 +32,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	private final UserRepo userRepo;
 
 	private final RoleRepo roleRepo;
+	
+	private final PermissionRepo permissionRepo;
 
 	private final PasswordEncoder passwordEncoder;
 
@@ -44,6 +48,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	public Role saveRole(Role role) {
 		log.info("Saving new role {} to the database", role.getName());
 		return roleRepo.save(role);
+	}
+	
+	@Override
+	public Permission savePermission(Permission permission) {
+		log.info("Saving new permission {}", permission.getDescription());
+		return permissionRepo.save(permission);
 	}
 
 	@Override
@@ -60,11 +70,41 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		log.info("Fetching user {}", username);
 		return userRepo.findByUsername(username);
 	}
+	
+	@Override
+	public User getUserById(Long id) {
+		log.info("Fetching user by id {}", id);
+		return userRepo.findById(id).get();
+	}
+	
+	@Override
+	public Role getRole(Long id) {
+		log.info("Fetching role by id {}", id);
+		return roleRepo.findById(id).get();
+	}
+
+	@Override
+	public Permission getPermission(Long id) {
+		log.info("Fetching permission by id {}", id);
+		return permissionRepo.findById(id).get();
+	}
 
 	@Override
 	public List<User> getUsers() {
 		log.info("Fetching all users");
 		return userRepo.findAll();
+	}
+	
+	@Override
+	public List<Role> getRoles() {
+		log.info("Fetching all roles");
+		return roleRepo.findAll();
+	}
+
+	@Override
+	public List<Permission> getPermissions() {
+		log.info("Fetching all permissions");
+		return permissionRepo.findAll();
 	}
 
 	@Override

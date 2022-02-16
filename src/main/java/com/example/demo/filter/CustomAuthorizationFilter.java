@@ -1,5 +1,6 @@
 package com.example.demo.filter;
 
+import static com.example.demo.constants.SecurityConstants.JWT_PROVIDER;
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -21,10 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.demo.util.TokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,17 +40,12 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 		} else {
 			// org.springframework.http.HttpHeaders.AUTHORIZATION;
 			String authorizationHeader = request.getHeader(AUTHORIZATION);
-			if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+			if (authorizationHeader != null && authorizationHeader.startsWith(JWT_PROVIDER)) {
 
 				try {
-					String token = authorizationHeader.substring("Bearer ".length());
-					Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-					JWTVerifier verifier = JWT.require(algorithm).build();
-
-					DecodedJWT decodeJWT = verifier.verify(token);
-
-					String username = decodeJWT.getSubject();
-					String[] roles = decodeJWT.getClaim("roles").asArray(String.class);
+					
+					String username = TokenUtil.getDecodeJWT(authorizationHeader);
+					String[] roles = TokenUtil.getRoles(authorizationHeader);
 
 					Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
