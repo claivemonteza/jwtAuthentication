@@ -44,13 +44,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		//org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 		http.sessionManagement().sessionCreationPolicy(STATELESS);
 		
-		http.authorizeRequests().antMatchers("/login/**", "/api/token/refresh/**").permitAll();
+		http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**").permitAll();
 		
 		//org.springframework.http.HttpMethod.GET
-		http.authorizeRequests().antMatchers(GET,"/api/user/**").hasAnyAuthority("ROLE_USER");
+		http.authorizeRequests().antMatchers(GET,"/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_MANAGER");
 		
 		//org.springframework.http.HttpMethod.POST
-		http.authorizeRequests().antMatchers(POST,"/api/user/save/**").hasAnyAuthority("ROLE_USER");
+		http.authorizeRequests().antMatchers(POST,"/api/user/save/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN");
 		//http.authorizeRequests().anyRequest().permitAll();
 		http.authorizeRequests().anyRequest().authenticated();
 		http.addFilter(customAuthentication);
