@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.domain.Permission;
 import com.example.demo.domain.Role;
 import com.example.demo.domain.User;
+import com.example.demo.dto.UserDTO;
 import com.example.demo.service.UserService;
 import com.example.demo.util.TokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,32 +58,28 @@ public class UserResource {
 	}
 
 	@PostMapping("/users/save")
-	public ResponseEntity<User> saveUser(@RequestBody User user) {
+	public ResponseEntity<User> saveUser(@RequestBody UserDTO userDTO) {
 
-		/*
-		 * URI uri =
-		 * URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path(
-		 * "/api/users/save").toUriString()); return
-		 * ResponseEntity.created(uri).body(userService.saveUser(user));
-		 */
+		List<Role> roles= new ArrayList<>();
+		User user = userDTO.toEntity();
+		user.getRoles().forEach(role->{
+			role = userService.getRole(role.getId());
+			roles.add(role);
+		});
+		user.setRoles(roles);
+
 		User newUser = userService.saveUser(user);
 		return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
 	}
 
 	@PostMapping("/role/save")
 	public ResponseEntity<Role> saveRole(@RequestBody Role role) {
-		/*
-		 * URI uri =
-		 * URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path(
-		 * "/api/role/save").toUriString()); return
-		 * ResponseEntity.created(uri).body(userService.saveRole(role));
-		 */
 		Role newRole = userService.saveRole(role);
 		return ResponseEntity.status(HttpStatus.CREATED).body(newRole);
 	}
 
 	@PostMapping("/role/addtouser")
-	public ResponseEntity<RoleToUserForm> saveRole(@RequestBody RoleToUserForm form) {
+	public ResponseEntity<RoleToUserForm> addRoleToUser(@RequestBody RoleToUserForm form) {
 		userService.addRoleToUser(form.getUsername(), form.getRoleName());
 		return ResponseEntity.ok().build();
 	}
