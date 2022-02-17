@@ -15,7 +15,7 @@ The API base URL is https://localhost:8080 and can be used to access the followi
 
 ### Login (POST)
 - endpoint -```/api/login```
-- 
+
 ### Save user (POST)
 - endpoint -```/api/users/save```
 
